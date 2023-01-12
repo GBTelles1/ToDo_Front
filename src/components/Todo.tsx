@@ -15,7 +15,7 @@ export function Todo() {
 
   const isNewToDoTextEmpty = newToDoText.length === 0;
 
-  const [doneToDos, setdoneToDos] = useState<string[]>([]) //conferir como foi feito com o onDeleteComment no Post
+  const [doneToDos, setDoneToDos] = useState<string[]>([])
 
   function handleCreateToDo(event: FormEvent) {
     event.preventDefault()
@@ -30,12 +30,32 @@ export function Todo() {
     setNewToDoText(event.target.value);
   }
 
-  function deleteToDo(toDoToDelete: string) {
+  function finishToDo(toDoToFinish: string) {
+    if (doneToDos.includes(toDoToFinish)) {
+      const toDosWithoutFinishedOne = doneToDos.filter(toDo => {
+        return (toDo !== toDoToFinish && doneToDos.indexOf(toDo) !== doneToDos.indexOf(toDoToFinish));
+      })
+  
+      setDoneToDos(toDosWithoutFinishedOne);
+    } else {
+      setDoneToDos([...doneToDos, toDoToFinish])
+    }
+  }
+
+  function deleteToDo(doneToDoToDelete: string) {
     const toDosWithoutDeletedOne = toDos.filter(toDo => {
-      return toDo !== toDoToDelete;
+      return toDo !== doneToDoToDelete;
     })
 
     setToDos(toDosWithoutDeletedOne);
+
+    if (doneToDos.includes(doneToDoToDelete)) {
+      const doneToDosWithoutDeletedOne = doneToDos.filter(toDo => {
+        return toDo !== doneToDoToDelete;
+      })
+  
+      setDoneToDos(doneToDosWithoutDeletedOne);
+    }
   }
 
   return(
@@ -93,6 +113,7 @@ export function Todo() {
                 key={toDo}
                 content={toDo}
                 onDeleteToDo={deleteToDo}
+                onFinishToDo={finishToDo}
               />
             ))}
           </div>
