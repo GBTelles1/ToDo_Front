@@ -61,10 +61,10 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  gap: 28.75rem;
 }
 
 .createdTasks {
+  width: auto;
   color: var(--blue-300);
   font-size: 0.875rem;
   display: flex;
@@ -83,6 +83,7 @@
 }
 
 .finishedTasks {
+  width: auto;
   color: var(--purple-300);
   font-size: 0.875rem;
   display: flex;

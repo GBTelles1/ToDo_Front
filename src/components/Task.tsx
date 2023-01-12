@@ -4,12 +4,17 @@ import styles from './Task.module.css'
 interface TaskProps {
   content: string;
   onDeleteToDo: (toDo: string) => void;
+  onFinishToDo: (toDo: string) => void;
 }
 
-export function Task({ content, onDeleteToDo }: TaskProps) {
+export function Task({ content, onDeleteToDo, onFinishToDo }: TaskProps) {
 
-  function handleDeleteTask() {
+  function handleDeleteToDo() {
     onDeleteToDo(content);
+  }
+
+  function handleFinishToDo() {
+    onFinishToDo(content);
   }
 
   return (
@@ -17,12 +22,12 @@ export function Task({ content, onDeleteToDo }: TaskProps) {
       <div className={styles.wrapper}>
         <input id={content} type='checkbox' name='taskCheck'/>
         
-        <label htmlFor={content} className={styles.taskContent}>
+        <label onClick={handleFinishToDo} htmlFor={content} className={styles.taskContent}>
           {content}
         </label>
       </div>
 
-      <button onClick={handleDeleteTask} title='Delete task'>
+      <button onClick={handleDeleteToDo} title='Delete task'>
         <Trash size={16} />
       </button>
     </div>
