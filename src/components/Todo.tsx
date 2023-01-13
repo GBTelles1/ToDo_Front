@@ -5,9 +5,15 @@ import clipboard from '../assets/clipboard.svg';
 import { PlusCircle } from 'phosphor-react';
 import styles from './Todo.module.css';
 import { Task } from './Task';
+import { v4 as uuidv4 } from 'uuid';
 
-export function Todo() {
-  const [toDos, setToDos] = useState<string[]>([])
+export interface TodoProps {
+  id: string;
+  content: string;
+}
+
+  export function Todo() {
+  const [toDos, setToDos] = useState<TodoProps[]>([])
 
   const isToDosEmpty = toDos.length === 0;
 
@@ -15,12 +21,12 @@ export function Todo() {
 
   const isNewToDoTextEmpty = newToDoText.length === 0;
 
-  const [doneToDos, setDoneToDos] = useState<string[]>([])
+  const [doneToDos, setDoneToDos] = useState<TodoProps[]>([])
 
   function handleCreateToDo(event: FormEvent) {
     event.preventDefault()
 
-    setToDos([...toDos, newToDoText]);
+    setToDos([...toDos, {id: uuidv4(), content: newToDoText}]);
 
     setNewToDoText('');
   }
@@ -30,28 +36,40 @@ export function Todo() {
     setNewToDoText(event.target.value);
   }
 
-  function finishToDo(toDoToFinish: string) {
-    if (doneToDos.includes(toDoToFinish)) {
+  function finishToDo(idToDoToFinish: string, toDoToFinishContent: string) {
+    if (isToDoInToDoList(doneToDos, idToDoToFinish)) {
       const toDosWithoutFinishedOne = doneToDos.filter(toDo => {
-        return (toDo !== toDoToFinish && doneToDos.indexOf(toDo) !== doneToDos.indexOf(toDoToFinish));
+        return (toDo.id !== idToDoToFinish);
       })
   
       setDoneToDos(toDosWithoutFinishedOne);
     } else {
-      setDoneToDos([...doneToDos, toDoToFinish])
+      setDoneToDos([...doneToDos, {id: idToDoToFinish, content: toDoToFinishContent}])
     }
   }
 
-  function deleteToDo(doneToDoToDelete: string) {
+  function isToDoInToDoList(toDoList:TodoProps[], toDoId:string) {
+    const toDoToDeleteList = toDoList.filter( toDo => {
+      return toDo.id === toDoId;
+    })
+
+    if (toDoToDeleteList.length > 0) {
+      return true;
+    } else if (toDoToDeleteList.length === 0) {
+      return false;
+    }
+  }
+
+  function deleteToDo(idDoneToDoToDelete: string) {
     const toDosWithoutDeletedOne = toDos.filter(toDo => {
-      return toDo !== doneToDoToDelete;
+      return toDo.id !== idDoneToDoToDelete;
     })
 
     setToDos(toDosWithoutDeletedOne);
 
-    if (doneToDos.includes(doneToDoToDelete)) {
+    if (isToDoInToDoList(doneToDos, idDoneToDoToDelete)) {
       const doneToDosWithoutDeletedOne = doneToDos.filter(toDo => {
-        return toDo !== doneToDoToDelete;
+        return toDo.id !== idDoneToDoToDelete;
       })
   
       setDoneToDos(doneToDosWithoutDeletedOne);
@@ -110,8 +128,8 @@ export function Todo() {
           <div className={styles.taskList}>
             {toDos.map( toDo => (
               <Task
-                key={toDo}
-                content={toDo}
+                key={toDo.id}
+                toDo={toDo}
                 onDeleteToDo={deleteToDo}
                 onFinishToDo={finishToDo}
               />

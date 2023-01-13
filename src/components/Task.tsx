@@ -1,29 +1,30 @@
 import { Trash } from 'phosphor-react';
 import styles from './Task.module.css'
+import { TodoProps } from './Todo';
 
 interface TaskProps {
-  content: string;
-  onDeleteToDo: (toDo: string) => void;
-  onFinishToDo: (toDo: string) => void;
+  toDo: TodoProps;
+  onDeleteToDo: (toDoKey: string) => void;
+  onFinishToDo: (toDoKey: string, content: string) => void;
 }
 
-export function Task({ content, onDeleteToDo, onFinishToDo }: TaskProps) {
+export function Task({ toDo, onDeleteToDo, onFinishToDo }: TaskProps) {
 
   function handleDeleteToDo() {
-    onDeleteToDo(content);
+    onDeleteToDo(toDo.id);
   }
 
   function handleFinishToDo() {
-    onFinishToDo(content);
+    onFinishToDo(toDo.id, toDo.content);
   }
 
   return (
     <div className={styles.task}>
       <div className={styles.wrapper}>
-        <input id={content} type='checkbox' name='taskCheck'/>
+        <input id={toDo.id} type='checkbox' name='taskCheck'/>
         
-        <label onClick={handleFinishToDo} htmlFor={content} className={styles.taskContent}>
-          {content}
+        <label onClick={handleFinishToDo} htmlFor={toDo.id} className={styles.taskContent}>
+          {toDo.content}
         </label>
       </div>
 
