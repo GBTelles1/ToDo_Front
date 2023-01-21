@@ -78,23 +78,23 @@ export interface TodoProps {
 
   return(
     <div className={styles.toDo}>
-      <div>
-        <form onSubmit={handleCreateToDo} className={styles.toDoForm}>
-          <input
-            type='text'
-            name='toDo'
-            placeholder='Adicione uma nova tarefa'
-            value={newToDoText}
-            onChange={handleNewToDoChange}
-            required
-          />
+      
+      <form onSubmit={handleCreateToDo} className={styles.toDoForm}>
+        <input
+          type='text'
+          name='toDo'
+          placeholder='Adicione uma nova tarefa'
+          value={newToDoText}
+          onChange={handleNewToDoChange}
+          required
+        />
 
-          <button type='submit' onSubmit={handleCreateToDo} disabled={isNewToDoTextEmpty}>
-            <strong>Criar</strong>
-            <PlusCircle size={16} />
-          </button>
-        </form>
-      </div>
+        <button type='submit' onSubmit={handleCreateToDo}>
+          <strong>Criar</strong>
+          <PlusCircle size={16} />
+        </button>
+      </form>
+      
 
       <div className={styles.taskGrid}>
         <div className={styles.wrapper}>
