@@ -1,19 +1,27 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 
-import clipboard from '../assets/clipboard.svg';
+import clipboard from './assets/clipboard.svg';
 
 import { PlusCircle } from 'phosphor-react';
-import styles from './Todo.module.css';
-import { Task } from './Task';
+import { Task } from '../Task';
 import { v4 as uuidv4 } from 'uuid';
+import { 
+  CreatedTasks,
+  FinishedTasks,
+  NoTaskContainer,
+  TaskGridContainer,
+  TaskListContainer,
+  ToDoContainer,
+  ToDoFormContainer
+ } from './styles';
 
-export interface TodoProps {
+export interface ToDoProps {
   id: string;
   content: string;
 }
 
-  export function Todo() {
-  const [toDos, setToDos] = useState<TodoProps[]>([])
+export function ToDo() {
+  const [toDos, setToDos] = useState<ToDoProps[]>([])
 
   const isToDosEmpty = toDos.length === 0;
 
@@ -21,12 +29,12 @@ export interface TodoProps {
 
   const isNewToDoTextEmpty = newToDoText.length === 0;
 
-  const [doneToDos, setDoneToDos] = useState<TodoProps[]>([])
+  const [doneToDos, setDoneToDos] = useState<ToDoProps[]>([])
 
   function handleCreateToDo(event: FormEvent) {
     event.preventDefault()
 
-    setToDos([...toDos, {id: uuidv4(), content: newToDoText}]);
+    setToDos((state) => [...state, {id: uuidv4(), content: newToDoText}]);
 
     setNewToDoText('');
   }
@@ -34,6 +42,10 @@ export interface TodoProps {
   function handleNewToDoChange(event: ChangeEvent<HTMLInputElement>) {
     event.target.setCustomValidity('');
     setNewToDoText(event.target.value);
+  }
+
+  function handleNewToDoInvalid(event: InvalidEvent<HTMLInputElement>) {
+    event.target.setCustomValidity('You must write something to to do');
   }
 
   function finishToDo(idToDoToFinish: string, toDoToFinishContent: string) {
@@ -44,11 +56,13 @@ export interface TodoProps {
   
       setDoneToDos(toDosWithoutFinishedOne);
     } else {
-      setDoneToDos([...doneToDos, {id: idToDoToFinish, content: toDoToFinishContent}])
+      setDoneToDos((state) => (
+        [...state, {id: idToDoToFinish, content: toDoToFinishContent}]
+      ))
     }
   }
 
-  function isToDoInToDoList(toDoList:TodoProps[], toDoId:string) {
+  function isToDoInToDoList(toDoList:ToDoProps[], toDoId:string) {
     const toDoToDeleteList = toDoList.filter( toDo => {
       return toDo.id === toDoId;
     })
@@ -77,44 +91,49 @@ export interface TodoProps {
   }
 
   return(
-    <div className={styles.toDo}>
+    <ToDoContainer>
       
-      <form onSubmit={handleCreateToDo} className={styles.toDoForm}>
+      <ToDoFormContainer onSubmit={handleCreateToDo}>
         <input
           type='text'
           name='toDo'
           placeholder='Adicione uma nova tarefa'
           value={newToDoText}
           onChange={handleNewToDoChange}
+          onInvalid={handleNewToDoInvalid}
           required
         />
 
-        <button type='submit' onSubmit={handleCreateToDo}>
+        <button
+          type='submit'
+          onSubmit={handleCreateToDo}
+          disabled={isNewToDoTextEmpty}
+        >
           <strong>Criar</strong>
           <PlusCircle size={16} />
         </button>
-      </form>
+      </ToDoFormContainer>
       
 
-      <div className={styles.taskGrid}>
-        <div className={styles.wrapper}>
-          <div className={styles.createdTasks}>
+      <TaskGridContainer>
+        <header>
+          <CreatedTasks>
             <strong>Tarefas Criadas</strong>
-            <span>{toDos.length}</span>
-          </div>
+            <div>{toDos.length}</div>
+          </CreatedTasks>
 
-          <div className={styles.finishedTasks}>
+          <FinishedTasks>
             <strong>Concluídas</strong>
             <div>
               <strong>
                 <span>{doneToDos.length}</span> de <span>{toDos.length}</span>
               </strong>
             </div>
-          </div>
-        </div>
+          </FinishedTasks>
+        </header>
 
         {isToDosEmpty ? (
-          <div className={styles.noTask}>
+          <NoTaskContainer>
             <img src={clipboard} />
             
             <div>
@@ -123,9 +142,9 @@ export interface TodoProps {
               <span>Crie tarefas e organize seus itens a fazer</span>
             </div>
 
-          </div>
+          </NoTaskContainer>
         ) : (
-          <div className={styles.taskList}>
+          <TaskListContainer>
             {toDos.map( toDo => (
               <Task
                 key={toDo.id}
@@ -134,9 +153,9 @@ export interface TodoProps {
                 onFinishToDo={finishToDo}
               />
             ))}
-          </div>
+          </TaskListContainer>
         )}
-      </div>
-    </div>
+      </TaskGridContainer>
+    </ToDoContainer>
   )
 }

@@ -1,9 +1,9 @@
 import { Trash } from 'phosphor-react';
-import styles from './Task.module.css'
-import { TodoProps } from './Todo';
+import { ToDoProps } from '../ToDo';
+import { TaskContainer } from './styles';
 
 interface TaskProps {
-  toDo: TodoProps;
+  toDo: ToDoProps;
   onDeleteToDo: (toDoKey: string) => void;
   onFinishToDo: (toDoKey: string, content: string) => void;
 }
@@ -19,11 +19,11 @@ export function Task({ toDo, onDeleteToDo, onFinishToDo }: TaskProps) {
   }
 
   return (
-    <div className={styles.task}>
-      <div className={styles.wrapper}>
+    <TaskContainer>
+      <div>
         <input id={toDo.id} type='checkbox' name='taskCheck'/>
         
-        <label onClick={handleFinishToDo} htmlFor={toDo.id} className={styles.taskContent}>
+        <label onClick={handleFinishToDo} htmlFor={toDo.id}>
           {toDo.content}
         </label>
       </div>
@@ -31,6 +31,6 @@ export function Task({ toDo, onDeleteToDo, onFinishToDo }: TaskProps) {
       <button onClick={handleDeleteToDo} title='Delete task'>
         <Trash size={16} />
       </button>
-    </div>
+    </TaskContainer>
   )
 }

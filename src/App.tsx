@@ -1,18 +1,18 @@
-import './global.css'
-
-import styles from './App.module.css'
-
-import { Header } from './components/Header'
-import { Todo } from './components/Todo'
+import { ThemeProvider } from 'styled-components'
+import { defaultTheme } from './styles/themes/default'
+import { GlobalStyle } from './styles/global'
+import { BrowserRouter } from 'react-router-dom'
+import { Router } from './Router'
 
 
 export function App() {
 
   return (
-    <div className={styles.wrapper}>
-      <Header />
-
-      <Todo />
-    </div>
+    <ThemeProvider theme={defaultTheme}>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
+      <GlobalStyle />
+    </ThemeProvider>
   )
 }
