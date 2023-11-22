@@ -1,11 +1,11 @@
 import { Trash } from 'phosphor-react';
-import { ToDoProps } from '../ToDo';
+import { ToDo } from '../ToDoApp';
 import { TaskContainer } from './styles';
 
 interface TaskProps {
-  toDo: ToDoProps;
+  toDo: ToDo;
   onDeleteToDo: (toDoKey: string) => void;
-  onFinishToDo: (toDoKey: string, content: string) => void;
+  onFinishToDo: (toDoKey: string) => void;
 }
 
 export function Task({ toDo, onDeleteToDo, onFinishToDo }: TaskProps) {
@@ -15,13 +15,13 @@ export function Task({ toDo, onDeleteToDo, onFinishToDo }: TaskProps) {
   }
 
   function handleFinishToDo() {
-    onFinishToDo(toDo.id, toDo.content);
+    onFinishToDo(toDo.id);
   }
 
   return (
     <TaskContainer>
       <div>
-        <input id={toDo.id} type='checkbox' name='taskCheck'/>
+        <input id={toDo.id} type='checkbox' name={toDo.id} checked={toDo.done}/>
         
         <label onClick={handleFinishToDo} htmlFor={toDo.id}>
           {toDo.content}

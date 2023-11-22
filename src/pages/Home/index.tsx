@@ -1,7 +1,7 @@
-import { ToDo } from "./components/ToDo";
+import { ToDoApp } from "./components/ToDoApp";
 
 export function Home() {
   return (
-    <ToDo />
+    <ToDoApp />
   )
 }

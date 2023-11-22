@@ -1,10 +1,9 @@
-import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useEffect, useState } from 'react';
 
 import clipboard from './assets/clipboard.svg';
 
 import { PlusCircle } from 'phosphor-react';
 import { Task } from '../Task';
-import { v4 as uuidv4 } from 'uuid';
 import { 
   CreatedTasks,
   FinishedTasks,
@@ -15,26 +14,47 @@ import {
   ToDoFormContainer
  } from './styles';
 
-export interface ToDoProps {
+export interface ToDo {
   id: string;
   content: string;
+  done: boolean;
 }
 
-export function ToDo() {
-  const [toDos, setToDos] = useState<ToDoProps[]>([])
+export function ToDoApp() {
+  const [toDosList, setToDosList] = useState<ToDo[]>(() => {
+    const localToDos = localStorage.getItem('@to-do:toDosList-state-0.0.0.0')
 
-  const isToDosEmpty = toDos.length === 0;
+    if (localToDos) {
+      return JSON.parse(localToDos)
+    }
+
+    return []
+  })
+
+  const isToDosEmpty = toDosList.length === 0;
 
   const [newToDoText, setNewToDoText] = useState('')
 
   const isNewToDoTextEmpty = newToDoText.length === 0;
 
-  const [doneToDos, setDoneToDos] = useState<ToDoProps[]>([])
+  const doneToDos = toDosList.filter((toDo) => {
+    return toDo.done === true;
+  })
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(toDosList)
+
+    localStorage.setItem('@to-do:toDosList-state-0.0.0.0', stateJSON)
+  }, [toDosList])
 
   function handleCreateToDo(event: FormEvent) {
     event.preventDefault()
 
-    setToDos((state) => [...state, {id: uuidv4(), content: newToDoText}]);
+    setToDosList((state) => [...state, {
+      id: crypto.randomUUID(),
+      content: newToDoText,
+      done: false
+    }]);
 
     setNewToDoText('');
   }
@@ -48,21 +68,21 @@ export function ToDo() {
     event.target.setCustomValidity('You must write something to to do');
   }
 
-  function finishToDo(idToDoToFinish: string, toDoToFinishContent: string) {
-    if (isToDoInToDoList(doneToDos, idToDoToFinish)) {
-      const toDosWithoutFinishedOne = doneToDos.filter(toDo => {
-        return (toDo.id !== idToDoToFinish);
-      })
-  
-      setDoneToDos(toDosWithoutFinishedOne);
-    } else {
-      setDoneToDos((state) => (
-        [...state, {id: idToDoToFinish, content: toDoToFinishContent}]
-      ))
-    }
+  function finishToDo(idToDoToFinish: string) {
+    const currentToDoIsFinished = toDosList.find((toDo) => toDo.id === idToDoToFinish)?.done
+
+    setToDosList((state) => 
+      state.map((toDo) => {
+        if (toDo.id === idToDoToFinish) {
+          return {...toDo, done: !currentToDoIsFinished}
+        }
+
+        return {...toDo}
+      }),
+    )
   }
 
-  function isToDoInToDoList(toDoList:ToDoProps[], toDoId:string) {
+  function isToDoInToDoList(toDoList:ToDo[], toDoId:string) {
     const toDoToDeleteList = toDoList.filter( toDo => {
       return toDo.id === toDoId;
     })
@@ -75,18 +95,13 @@ export function ToDo() {
   }
 
   function deleteToDo(idDoneToDoToDelete: string) {
-    const toDosWithoutDeletedOne = toDos.filter(toDo => {
-      return toDo.id !== idDoneToDoToDelete;
-    })
-
-    setToDos(toDosWithoutDeletedOne);
-
-    if (isToDoInToDoList(doneToDos, idDoneToDoToDelete)) {
-      const doneToDosWithoutDeletedOne = doneToDos.filter(toDo => {
+    
+    if (isToDoInToDoList(toDosList, idDoneToDoToDelete)) {
+      const toDosWithoutDeletedOne = toDosList.filter(toDo => {
         return toDo.id !== idDoneToDoToDelete;
       })
-  
-      setDoneToDos(doneToDosWithoutDeletedOne);
+
+      setToDosList(toDosWithoutDeletedOne);
     }
   }
 
@@ -119,14 +134,14 @@ export function ToDo() {
         <header>
           <CreatedTasks>
             <strong>Tarefas Criadas</strong>
-            <div>{toDos.length}</div>
+            <div>{toDosList.length}</div>
           </CreatedTasks>
 
           <FinishedTasks>
             <strong>Concluídas</strong>
             <div>
               <strong>
-                <span>{doneToDos.length}</span> de <span>{toDos.length}</span>
+                <span>{doneToDos.length}</span> de <span>{toDosList.length}</span>
               </strong>
             </div>
           </FinishedTasks>
@@ -145,7 +160,7 @@ export function ToDo() {
           </NoTaskContainer>
         ) : (
           <TaskListContainer>
-            {toDos.map( toDo => (
+            {toDosList.map((toDo) => (
               <Task
                 key={toDo.id}
                 toDo={toDo}
